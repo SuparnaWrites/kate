@@ -573,6 +573,15 @@ public:
         setSpacing(0);
 
         connect(qApp, &QApplication::paletteChanged, this, &BreadCrumbView::updatePalette, Qt::QueuedConnection);
+
+        KSharedConfigPtr sharedConfig = KSharedConfig::openConfig();
+        KConfigGroup c(sharedConfig, "KTextEditor View");
+        if (c.readEntry("Urlbar Small Font", true)) {
+            auto font = this->font();
+            font.setPointSize(font.pointSize() - 1);
+            setFont(font);
+        }
+
         updatePalette();
 
         connect(this, &QListView::clicked, this, &BreadCrumbView::onClicked);
