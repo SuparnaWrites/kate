@@ -574,14 +574,6 @@ public:
 
         connect(qApp, &QApplication::paletteChanged, this, &BreadCrumbView::updatePalette, Qt::QueuedConnection);
 
-        KSharedConfigPtr sharedConfig = KSharedConfig::openConfig();
-        KConfigGroup c(sharedConfig, "KTextEditor View");
-        if (c.readEntry("Urlbar Small Font", true)) {
-            auto font = this->font();
-            font.setPointSize(font.pointSize() - 1);
-            setFont(font);
-        }
-
         updatePalette();
 
         connect(this, &QListView::clicked, this, &BreadCrumbView::onClicked);
@@ -1011,6 +1003,9 @@ public:
         connect(&m_fullPathHideTimer, &QTimer::timeout, this, &UrlbarContainer::hideFullPath);
         m_fullPathHideTimer.setInterval(1s);
         m_fullPathHideTimer.setSingleShot(true);
+
+        connect(KateApp::self(), &KateApp::configurationChanged, this, &UrlbarContainer::readConfig);
+        readConfig();
     }
 
     void open()
@@ -1063,6 +1058,19 @@ protected:
     {
         m_fullPathHideTimer.stop();
         QWidget::leaveEvent(e);
+    }
+
+private Q_SLOTS:
+    void readConfig()
+    {
+        KSharedConfigPtr sharedConfig = KSharedConfig::openConfig();
+        KConfigGroup c(sharedConfig, "General");
+        auto font = this->font();
+        if (c.readEntry("Urlbar Small Font", true)) {
+            font.setPointSize(font.pointSize() - 1);
+        }
+        m_baseCrumbView->setFont(font);
+        m_mainCrumbView->setFont(font);
     }
 
 private:

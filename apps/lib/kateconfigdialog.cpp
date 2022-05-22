@@ -234,6 +234,19 @@ void KateConfigDialog::addBehaviorPage()
 
     buttonGroup->setLayout(vbox);
 
+    // BEGIN Urlbar options
+    buttonGroup = new QGroupBox(i18n("Urlbar"), generalFrame);
+    vbox = new QVBoxLayout;
+    layout->addWidget(buttonGroup);
+
+    m_urlbarSmallFont = new QCheckBox(i18n("Use smaller font"), buttonGroup);
+    m_urlbarSmallFont->setChecked(cgGeneral.readEntry("Urlbar Small Font", true));
+    m_urlbarSmallFont->setToolTip(i18n("Let the urlbar less stick out."));
+    connect(m_urlbarSmallFont, &QCheckBox::toggled, this, &KateConfigDialog::slotChanged);
+    vbox->addWidget(m_urlbarSmallFont);
+    buttonGroup->setLayout(vbox);
+    // END Urlbar options
+
     layout->addStretch(1); // :-] works correct without autoadd
 }
 
@@ -457,6 +470,8 @@ void KateConfigDialog::slotApply()
 
         cg.writeEntry("Allow Tab Scrolling", m_tabsScrollable->isChecked());
         cg.writeEntry("Elide Tab Text", m_tabsElided->isChecked());
+
+        cg.writeEntry("Urlbar Small Font", m_urlbarSmallFont->isChecked());
 
         // patch document modified warn state
         const QList<KTextEditor::Document *> &docs = KateApp::self()->documentManager()->documentList();
